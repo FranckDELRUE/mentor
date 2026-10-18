@@ -66,6 +66,7 @@ def creer_app(ctx: Contexte) -> FastAPI:
         contexte = {
             "ctx": ctx, "app_nom": ctx.discipline.nom, "version_socle": __version__,
             "pin_defini": bool(pin_hash()), "nb_validations": nb, "gpu": gpu.etat(),
+            "css_version": int((DOSSIER_WEB / "static" / "mentor.css").stat().st_mtime),
             "autres_mentor": autres, "menu_discipline": ctx.discipline.liens_menu(), **variables,
         }
         return HTMLResponse(env.get_template(nom).render(**contexte), status_code=statut)

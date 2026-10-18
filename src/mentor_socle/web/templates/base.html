@@ -2,7 +2,7 @@
 <html lang="fr">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{% block titre %}{{ app_nom }}{% endblock %}</title>
-<link rel="stylesheet" href="/static/mentor.css">{% block tete %}{% endblock %}</head>
+<link rel="stylesheet" href="/static/mentor.css?v={{ css_version }}">{% block tete %}{% endblock %}</head>
 <body>
 <header>
   <strong>{{ app_nom }}</strong>
