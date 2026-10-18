@@ -19,6 +19,7 @@
 </header>
 <main>
 {% if not pin_defini %}<div class="bandeau">Aucun PIN parent : l'interface est ouverte à tous. <code>uv run mentor parent set-pin</code></div>{% endif %}
+{% if travailleur_arrete %}<div class="bandeau">Le travailleur est arrêté : les tâches ne sont plus exécutées. Redémarrer <code>uv run mentor serve</code> (détail dans le journal).</div>{% endif %}
 {% block contenu %}{% endblock %}
 </main>
 <footer>{{ app_nom }} · socle {{ version_socle }} · 100 % local</footer>

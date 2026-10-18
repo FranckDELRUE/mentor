@@ -7,6 +7,7 @@ import getpass
 import re
 import sys
 import threading
+import time
 from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -19,6 +20,7 @@ from mentor_socle.referentiel import verifier_kit
 
 if TYPE_CHECKING:
     from mentor_socle.config import SocleSettings
+    from mentor_socle.taches import Travailleur
 
 INTERVALLE_VEILLE_S = 30.0
 
@@ -200,28 +202,39 @@ def _servir(discipline: Discipline) -> None:
                      name="mentor-veille").start()
     print(f"{discipline.nom} : http://{reglages.app.host}:{reglages.app.port}")
     try:
-        uvicorn.run(creer_app(ctx), host=reglages.app.host, port=reglages.app.port, log_level="info",
+        uvicorn.run(creer_app(ctx, travailleur), host=reglages.app.host, port=reglages.app.port, log_level="info",
                     timeout_graceful_shutdown=3)
     finally:
         print("Arrêt demandé : fin de la tâche en cours…")
         arret.set()
         travailleur.arreter()
-        travailleur.join(timeout=10)
+        _attendre_fin(travailleur)
+
+
+def _attendre_fin(travailleur: Travailleur, delai_s: float = 10) -> None:
+    """Attend la fin de la tâche en cours ; un second Ctrl+C abandonne l'attente."""
+    fin = time.monotonic() + delai_s
+    try:
+        # Sur ``fini`` et non ``join()`` : un Ctrl+C pendant ``join()`` fausse ``is_alive()`` sous Windows.
+        while not travailleur.fini.wait(0.5) and time.monotonic() < fin:
+            pass
+    except KeyboardInterrupt:
+        print("Arrêt immédiat : la tâche en cours sera reprise au prochain lancement.")
 
 
 def _travailleur_seul(discipline: Discipline) -> None:
     travailleur = _travailler(_ouvrir(discipline))
     print("Travailleur démarré (Ctrl+C pour arrêter).")
     try:
-        # ``join()`` sans délai n'est pas interruptible par Ctrl+C sous Windows : on l'appelle par petits pas.
-        while travailleur.is_alive():
-            travailleur.join(timeout=0.5)
+        # Par petits pas : une attente sans délai n'est pas interruptible par Ctrl+C sous Windows.
+        while not travailleur.fini.wait(0.5):
+            pass
         # Seul Ctrl+C demande l'arrêt : sortir de la boucle sans lui est une panne.
         sys.exit("Le travailleur s'est arrêté de façon inattendue : voir le journal.")
     except KeyboardInterrupt:
         print("Arrêt demandé : fin de la tâche en cours…")
         travailleur.arreter()
-        travailleur.join(timeout=10)
+        _attendre_fin(travailleur)
 
 
 def main(cls: type[Discipline], racine: Path | str, argv: Sequence[str] | None = None) -> None:

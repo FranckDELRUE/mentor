@@ -23,6 +23,8 @@ from mentor_socle.taches import ajouter
 from mentor_socle.web.auth import DUREE_SESSION_S, jeton_valide, serialiseur, verifier_pin
 
 if TYPE_CHECKING:
+    import threading
+
     from mentor_socle.contexte import Contexte
 
 DOSSIER_WEB = Path(__file__).parent
@@ -47,8 +49,11 @@ def _environnement(ctx: Contexte) -> Environment:
     return env
 
 
-def creer_app(ctx: Contexte) -> FastAPI:
-    """Construit l'application FastAPI de l'interface parent pour ``ctx``."""
+def creer_app(ctx: Contexte, travailleur: threading.Thread | None = None) -> FastAPI:
+    """Construit l'application FastAPI de l'interface parent pour ``ctx``.
+
+    Si ``travailleur`` est donné, chaque page affiche un bandeau quand il s'est arrêté.
+    """
     app = FastAPI(title=ctx.discipline.nom, docs_url=None, redoc_url=None, openapi_url=None)
     env = _environnement(ctx)
     app.mount("/static", StaticFiles(directory=str(DOSSIER_WEB / "static")), name="static")
@@ -65,7 +70,8 @@ def creer_app(ctx: Contexte) -> FastAPI:
         autres = {c: e for c, e in registre.lire().items() if c != ctx.discipline.code}
         contexte = {
             "ctx": ctx, "app_nom": ctx.discipline.nom, "version_socle": __version__,
-            "pin_defini": bool(pin_hash()), "nb_validations": nb, "gpu": gpu.etat(),
+            "pin_defini": bool(pin_hash()), "nb_validations": nb,
+            "travailleur_arrete": travailleur is not None and not travailleur.is_alive(), "gpu": gpu.etat(),
             "css_version": int((DOSSIER_WEB / "static" / "mentor.css").stat().st_mtime),
             "autres_mentor": autres, "menu_discipline": ctx.discipline.liens_menu(), **variables,
         }

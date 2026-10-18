@@ -116,20 +116,25 @@ class Travailleur(threading.Thread):
         self.gestionnaires = gestionnaires
         self.attente_s = attente_s
         self._arret = threading.Event()  # pas ``_stop`` : écraserait Thread._stop
+        # Posé à la sortie de ``run`` : sous Windows, un Ctrl+C pendant ``join()`` fausse ``is_alive()``.
+        self.fini = threading.Event()
 
     def run(self) -> None:
         try:
-            reprendre_orphelines(self.ctx.cx)
-        except Exception:
-            log.exception("Reprise des tâches orphelines impossible : le travailleur s'arrête")
-            raise
-        while not self._arret.is_set():
             try:
-                if executer_une(self.ctx, self.gestionnaires):
-                    continue
+                reprendre_orphelines(self.ctx.cx)
             except Exception:
-                log.exception("Erreur du travailleur")
-            self._arret.wait(self.attente_s)
+                log.exception("Reprise des tâches orphelines impossible : le travailleur s'arrête")
+                raise
+            while not self._arret.is_set():
+                try:
+                    if executer_une(self.ctx, self.gestionnaires):
+                        continue
+                except Exception:
+                    log.exception("Erreur du travailleur")
+                self._arret.wait(self.attente_s)
+        finally:
+            self.fini.set()
 
     def arreter(self) -> None:
         """Demande l'arrêt ; le thread termine la tâche en cours puis s'arrête."""
