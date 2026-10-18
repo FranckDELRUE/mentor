@@ -14,3 +14,13 @@ button,input,select,textarea{font:inherit}button{background:var(--accent);color:
 button.second{background:transparent;color:var(--texte);border:1px solid var(--ligne)}
 form.ligne{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}input,select,textarea{padding:.35rem;border:1px solid var(--ligne);border-radius:5px;background:var(--carte);color:var(--texte)}
 pre{white-space:pre-wrap;font-size:.82rem;margin:0}footer{color:var(--doux);font-size:.8rem;text-align:center;padding:1.5rem}
+.validation{margin-bottom:1rem;max-width:760px}
+.validation-tete{display:flex;flex-wrap:wrap;gap:.4rem .8rem;align-items:baseline;justify-content:space-between;padding:0;border:0;background:none}
+.validation-tete h2{font-size:1.1rem;margin:0}
+.etiquette{font-size:.8rem;color:var(--accent);border:1px solid var(--accent);border-radius:1em;padding:.05rem .6rem}
+.validation-meta{margin:.3rem 0 .9rem;font-size:.9rem}
+.lien-doc{color:var(--accent);font-weight:600}
+dl.details{display:grid;grid-template-columns:max-content 1fr;gap:.3rem 1rem;margin:0 0 1rem;padding:.7rem .9rem;background:var(--fond);border:1px solid var(--ligne);border-radius:6px;font-size:.9rem}
+dl.details dt{color:var(--doux)}dl.details dd{margin:0;overflow-wrap:anywhere}
+dl.details code{font:.85em ui-monospace,Consolas,monospace}
+.validation-actions{padding-top:.2rem}.validation-actions input{flex:1 1 220px}

@@ -1,17 +1,32 @@
 {% extends "base.html" %}
 {% block contenu %}
 <h1>À valider</h1>
+{% set noms = {'document': 'Document', 'tache': 'Tâche', 'feuille': 'Feuille', 'copie': 'Copie'} %}
 {% for v in validations %}
-<div class="carte" style="margin-bottom:.8rem">
-  <h2>{{ v.motif }}</h2>
-  <p class="doux">{{ v.objet_type }} n°{{ v.objet_id }} · {{ v.cree_le }}
-    {% if v.objet_type == 'document' %}· <a href="/documents/{{ v.objet_id }}/original" target="_blank" rel="noopener">Voir le document</a>{% endif %}</p>
-  {% set d = v.details|dejs %}{% if d %}<pre>{{ d|tojson(indent=1) }}</pre>{% endif %}
-  <form class="ligne" method="post" action="/validations/{{ v.id }}">
-    <input name="decision" placeholder="Décision / commentaire" style="flex:1">
+{% set d = v.details|dejs %}
+<article class="carte validation">
+  <header class="validation-tete">
+    <h2>{{ v.motif }}</h2>
+    <span class="etiquette">{{ noms.get(v.objet_type, v.objet_type|capitalize) }} n°{{ v.objet_id }}</span>
+  </header>
+  <p class="doux validation-meta">
+    Reçu le {{ v.cree_le[8:10] }}/{{ v.cree_le[5:7] }}/{{ v.cree_le[0:4] }} à {{ v.cree_le[11:16] }}
+    {% if v.objet_type == 'document' %}·
+    <a class="lien-doc" href="/documents/{{ v.objet_id }}/original" target="_blank" rel="noopener">Voir le document</a>{% endif %}
+  </p>
+  {% if d is mapping and d %}
+  <dl class="details">
+    {% for cle, valeur in d.items() %}
+    <dt>{{ (cle|replace('_', ' '))|capitalize }}</dt>
+    <dd>{% if valeur is string or valeur is number %}{{ valeur }}{% else %}<code>{{ valeur|tojson }}</code>{% endif %}</dd>
+    {% endfor %}
+  </dl>
+  {% elif d %}<pre>{{ d|tojson(indent=1) }}</pre>{% endif %}
+  <form class="ligne validation-actions" method="post" action="/validations/{{ v.id }}">
+    <input name="decision" placeholder="Décision ou commentaire (facultatif)" aria-label="Décision ou commentaire">
     <button name="statut" value="acceptee">Accepter</button>
     <button class="second" name="statut" value="refusee">Refuser</button>
   </form>
-</div>
+</article>
 {% else %}<p class="doux">Rien à valider.</p>{% endfor %}
 {% endblock %}
