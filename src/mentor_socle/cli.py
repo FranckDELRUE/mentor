@@ -152,15 +152,23 @@ def _travailler(ctx: Contexte):
     return travailleur
 
 
-def _veille(ctx: Contexte, arret: threading.Event, intervalle_s: float = INTERVALLE_VEILLE_S) -> None:
-    """Boîte de dépôt toutes les ``intervalle_s`` secondes et sauvegarde automatique quand elle est due."""
+def _veille(ctx: Contexte, arret: threading.Event, intervalle_s: float = INTERVALLE_VEILLE_S,
+            travailleur: threading.Thread | None = None) -> None:
+    """Boîte de dépôt toutes les ``intervalle_s`` secondes et sauvegarde automatique quand elle est due.
+
+    Si ``travailleur`` est donné, signale une fois dans le journal qu'il s'est arrêté sans qu'on le demande.
+    """
     import logging
 
     from mentor_socle.scan import inbox
     from mentor_socle.taches import ajouter
 
     log = logging.getLogger("mentor.veille")
+    panne_signalee = False
     while not arret.is_set():
+        if travailleur is not None and not travailleur.is_alive() and not panne_signalee:
+            log.error("Le travailleur s'est arrêté de façon inattendue : les tâches ne sont plus exécutées")
+            panne_signalee = True
         try:
             bilan = inbox.scanner(ctx)
             if bilan.recus or bilan.renvoyes or bilan.illisibles:
@@ -188,7 +196,8 @@ def _servir(discipline: Discipline) -> None:
         print(f"Attention : {conflit}.")
     travailleur = _travailler(ctx)
     arret = threading.Event()
-    threading.Thread(target=_veille, args=(ctx, arret), daemon=True, name="mentor-veille").start()
+    threading.Thread(target=_veille, args=(ctx, arret, INTERVALLE_VEILLE_S, travailleur), daemon=True,
+                     name="mentor-veille").start()
     print(f"{discipline.nom} : http://{reglages.app.host}:{reglages.app.port}")
     try:
         uvicorn.run(creer_app(ctx), host=reglages.app.host, port=reglages.app.port, log_level="info",
@@ -207,6 +216,8 @@ def _travailleur_seul(discipline: Discipline) -> None:
         # ``join()`` sans délai n'est pas interruptible par Ctrl+C sous Windows : on l'appelle par petits pas.
         while travailleur.is_alive():
             travailleur.join(timeout=0.5)
+        # Seul Ctrl+C demande l'arrêt : sortir de la boucle sans lui est une panne.
+        sys.exit("Le travailleur s'est arrêté de façon inattendue : voir le journal.")
     except KeyboardInterrupt:
         print("Arrêt demandé : fin de la tâche en cours…")
         travailleur.arreter()

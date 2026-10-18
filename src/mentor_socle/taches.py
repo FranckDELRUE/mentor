@@ -118,7 +118,11 @@ class Travailleur(threading.Thread):
         self._arret = threading.Event()  # pas ``_stop`` : écraserait Thread._stop
 
     def run(self) -> None:
-        reprendre_orphelines(self.ctx.cx)
+        try:
+            reprendre_orphelines(self.ctx.cx)
+        except Exception:
+            log.exception("Reprise des tâches orphelines impossible : le travailleur s'arrête")
+            raise
         while not self._arret.is_set():
             try:
                 if executer_une(self.ctx, self.gestionnaires):

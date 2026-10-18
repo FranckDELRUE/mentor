@@ -21,6 +21,7 @@
 | 2026-10-18 | 10 (cache CSS) | Le lien vers `mentor.css` porte `?v=<date de modification>` : un CSS modifié est rechargé sans Ctrl+F5 | Version = `st_mtime` du fichier, lue à chaque page | Aucune |
 | 2026-10-18 | 11 (Ctrl+C) | `mentor worker` : attente par `join(timeout=0.5)` en boucle (un `join()` sans délai n'est pas interruptible sous Windows, cause reproduite) ; `serve` : `timeout_graceful_shutdown=3` | Message « Arrêt demandé » à l'interruption | Ctrl+C réel confirmé à la main par le propriétaire (2026-10-18) |
 | 2026-10-18 | 11 (arrêt de serve) | `serve` attend la fin de la tâche en cours à l'arrêt (`join(timeout=10)` après `arreter()`), même message « Arrêt demandé » que `worker` | Le thread démon n'est plus coupé net à la sortie du processus | `test_cli_sur_un_mentor_cree` échoue sur ce poste quand Ollama tourne avec les modèles installés (`check` rend 0, le test attend 1) : indépendant de ce changement, échoue aussi sans lui |
+| 2026-10-18 | 11 (pannes du travailleur) | `mentor worker` sort avec le code 1 et un message si le travailleur s'arrête sans Ctrl+C ; `serve` : la veille consigne une fois dans le journal un travailleur arrêté ; `Travailleur.run` consigne l'échec de `reprendre_orphelines` avant de le relancer | Pas de redémarrage automatique : la panne est signalée, pas masquée | Sous `serve`, l'interface reste ouverte sans travailleur (seul le journal le dit) ; vérifié par simulation, pas par un test |
 
 ## Questions ouvertes
 (Une question précise par ligne ; Claude Code les pose ici plutôt que d'inventer.)
