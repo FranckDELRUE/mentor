@@ -28,11 +28,15 @@ class ElementPlan:
 
 
 def budget_semaine(ctx: Contexte, jour: dt.date | None = None) -> int:
-    """Minutes de travail de la semaine (lundi-dimanche) de ``jour``, majorées si ≥ 4 jours de vacances."""
+    """Minutes de travail de la semaine à planifier, majorées si ≥ 4 jours de vacances.
+
+    La semaine va du mardi au lundi et commence au premier mardi à partir de ``jour`` : un plan établi
+    le lundi couvre les sept jours à venir.
+    """
     jour = jour or dt.date.today()
-    lundi = jour - dt.timedelta(days=jour.weekday())
+    mardi = jour + dt.timedelta(days=(1 - jour.weekday()) % 7)
     charge = ctx.settings.charge
-    vacances = sum(ctx.settings.calendrier.en_vacances(lundi + dt.timedelta(days=i)) for i in range(7))
+    vacances = sum(ctx.settings.calendrier.en_vacances(mardi + dt.timedelta(days=i)) for i in range(7))
     return int(charge.hebdo_min * charge.coefficient_vacances) if vacances >= 4 else charge.hebdo_min
 
 
