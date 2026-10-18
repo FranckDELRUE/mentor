@@ -194,8 +194,10 @@ def _servir(discipline: Discipline) -> None:
         uvicorn.run(creer_app(ctx), host=reglages.app.host, port=reglages.app.port, log_level="info",
                     timeout_graceful_shutdown=3)
     finally:
+        print("Arrêt demandé : fin de la tâche en cours…")
         arret.set()
         travailleur.arreter()
+        travailleur.join(timeout=10)
 
 
 def _travailleur_seul(discipline: Discipline) -> None:

@@ -20,6 +20,7 @@
 | 2026-10-18 | 10 (dépôt) | Page « Déposer un scan » : champs étiquetés en colonne, bouton « Choisir un fichier » au style des boutons secondaires (`::file-selector-button`) | CSS seulement, aucune route modifiée | Aspect du sélecteur de fichier propre à chaque navigateur pour le texte « Aucun fichier choisi » |
 | 2026-10-18 | 10 (cache CSS) | Le lien vers `mentor.css` porte `?v=<date de modification>` : un CSS modifié est rechargé sans Ctrl+F5 | Version = `st_mtime` du fichier, lue à chaque page | Aucune |
 | 2026-10-18 | 11 (Ctrl+C) | `mentor worker` : attente par `join(timeout=0.5)` en boucle (un `join()` sans délai n'est pas interruptible sous Windows, cause reproduite) ; `serve` : `timeout_graceful_shutdown=3` | Message « Arrêt demandé » à l'interruption | Ctrl+C réel confirmé à la main par le propriétaire (2026-10-18) |
+| 2026-10-18 | 11 (arrêt de serve) | `serve` attend la fin de la tâche en cours à l'arrêt (`join(timeout=10)` après `arreter()`), même message « Arrêt demandé » que `worker` | Le thread démon n'est plus coupé net à la sortie du processus | `test_cli_sur_un_mentor_cree` échoue sur ce poste quand Ollama tourne avec les modèles installés (`check` rend 0, le test attend 1) : indépendant de ce changement, échoue aussi sans lui |
 
 ## Questions ouvertes
 (Une question précise par ligne ; Claude Code les pose ici plutôt que d'inventer.)
