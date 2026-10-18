@@ -44,3 +44,5 @@ addopts = "-q --continue-on-collection-errors -p no:warnings"
 [tool.ruff]
 line-length = 110
 target-version = "py312"
+# Gabarit de Mentor : fichiers à marqueurs (__PAQUET__…), recopiés tels quels des assets.
+extend-exclude = ["src/mentor_socle/gabarit_app"]

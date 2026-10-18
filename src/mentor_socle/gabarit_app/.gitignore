@@ -1,0 +1,12 @@
+# Données de l'élève (mineur) : jamais versionnées
+data/
+config/settings.yaml
+config/modeles.yaml
+evals/copies_etalons/*/
+evals/resultats/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.log

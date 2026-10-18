@@ -1,0 +1,36 @@
+# Copier en config/settings.yaml (jamais versionné) puis compléter.
+app:
+  host: "127.0.0.1"
+  port: __PORT__
+  strict_offline: true
+
+chemins:
+  data: "./data"
+  # inbox: "C:/Users/<vous>/OneDrive/Scans/__CODE__"   # facultatif
+  # sauvegardes: "D:/Sauvegardes/__PROJET__"
+
+eleve:
+  prenom: ""
+  classe: "Première générale"
+  etablissement: "Marcq Institution"
+  annee_scolaire: "2026-2027"
+
+parent:
+  pin_hash: ""        # uv run mentor parent set-pin
+
+sauvegarde:
+  automatique: quotidienne
+  conserver: 30
+
+charge:
+  hebdo_min: 90
+  seance_max_min: 25
+  coefficient_vacances: 1.5
+
+calendrier:
+  zone: B
+  vacances: []        # - {nom: Toussaint, debut: 2026-10-17, fin: 2026-11-02}
+  evaluations: []     # - {date: 2026-11-20, type: ds, chapitres: [C01], coefficient: 2, libelle: "DS n°2"}
+
+pedagogie:
+  niveau_exigence: 2
