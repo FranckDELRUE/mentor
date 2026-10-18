@@ -118,6 +118,10 @@ pdf = feuilles.imprimer(ctx, fid)         # refuse si la feuille n'est pas « pr
 
 - Après chaque correction : `erreurs.enregistrer(ctx.cx, copie_id, erreurs, taxonomie)` (codes vérifiés)
   et `competences.observer(ctx.cx, code, score, poids=…)` (1 pour un DS, 0,5 pour un entraînement).
+- Le modèle ne doit jamais sortir de code hors taxonomie : dans le schéma de sortie de la correction, déclarer les
+  erreurs avec `taxonomie.modele_erreur()` (le champ `code` y est une énumération des codes permis, transmise à
+  Ollama et revalidée), et insérer `taxonomie.pour_prompt()` dans le prompt. `enregistrer` reste le dernier
+  filet : un code inconnu y lève `ValueError` et rien n'est écrit.
 - Les notes du professeur vont dans `notes_reelles` : c'est la vérité terrain pour calibrer.
 - `planificateur.planifier(ctx)` rend des `ElementPlan` motivés ; la discipline les transforme en feuilles.
 
