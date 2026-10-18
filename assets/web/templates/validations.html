@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block contenu %}
+<h1>À valider</h1>
+{% for v in validations %}
+<div class="carte" style="margin-bottom:.8rem">
+  <h2>{{ v.motif }}</h2>
+  <p class="doux">{{ v.objet_type }} n°{{ v.objet_id }} · {{ v.cree_le }}</p>
+  {% set d = v.details|dejs %}{% if d %}<pre>{{ d|tojson(indent=1) }}</pre>{% endif %}
+  <form class="ligne" method="post" action="/validations/{{ v.id }}">
+    <input name="decision" placeholder="Décision / commentaire" style="flex:1">
+    <button name="statut" value="acceptee">Accepter</button>
+    <button class="second" name="statut" value="refusee">Refuser</button>
+  </form>
+</div>
+{% else %}<p class="doux">Rien à valider.</p>{% endfor %}
+{% endblock %}

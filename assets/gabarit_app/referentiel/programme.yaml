@@ -1,0 +1,8 @@
+# Programme officiel structuré (source : BO / Éduscol, à citer chapitre par chapitre).
+source: "BO à préciser"
+chapitres:
+  - id: C01
+    titre: "Chapitre à renseigner"
+    notions: []
+    capacites: []
+    hors_programme: []

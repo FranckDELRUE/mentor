@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block contenu %}
+<div class="carte" style="max-width:360px">
+<h1>Accès parent</h1>
+{% if erreur %}<p class="erreur">PIN incorrect.</p>{% endif %}
+<form method="post" action="/connexion" class="ligne">
+  <input type="password" name="pin" inputmode="numeric" autocomplete="current-password" placeholder="PIN" required autofocus>
+  <button>Entrer</button>
+</form></div>
+{% endblock %}

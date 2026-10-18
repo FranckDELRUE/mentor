@@ -1,0 +1,9 @@
+erreurs:
+  - code: E-CONSIGNE
+    libelle: Ne répond pas exactement à la consigne
+    famille: methode
+    gravite: 2
+  - code: E-REDACTION
+    libelle: Rédaction confuse ou incomplète
+    famille: expression
+    gravite: 1

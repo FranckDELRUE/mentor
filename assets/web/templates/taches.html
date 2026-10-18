@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block tete %}<meta http-equiv="refresh" content="15">{% endblock %}
+{% block contenu %}
+<h1>Tâches de fond</h1>
+<div class="carte"><table>
+<tr><th>#</th><th>Type</th><th>Statut</th><th>Essais</th><th>Créée</th><th>Erreur</th><th></th></tr>
+{% for t in taches %}<tr>
+  <td>{{ t.id }}</td><td>{{ t.type }}</td>
+  <td class="{{ {'faite':'ok','echec':'erreur','a_valider':'alerte'}.get(t.statut,'') }}">{{ t.statut|replace('_',' ') }}</td>
+  <td>{{ t.essais }}/{{ t.max_essais }}</td><td class="doux">{{ t.cree_le }}</td>
+  <td><pre class="erreur">{{ (t.erreur or '')[:300] }}</pre></td>
+  <td>{% if t.statut == 'echec' %}<form method="post" action="/taches/{{ t.id }}/relancer"><button class="second">Relancer</button></form>{% endif %}</td>
+</tr>{% endfor %}
+</table></div>
+{% endblock %}

@@ -1,0 +1,5 @@
+roles:
+  vision: {modele: "faux-vision"}
+  generateur: {modele: "faux-generateur"}
+  correcteur: {modele: "faux-correcteur"}
+  embeddings: {modele: "faux-embed", verrou_gpu: false}

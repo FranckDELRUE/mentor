@@ -1,0 +1,24 @@
+# Rôles de modèles (Ollama). Tags à revérifier sur ollama.com au moment de l'installation.
+# Un seul modèle lourd à la fois sur la machine : le verrou GPU commun s'en charge.
+roles:
+  vision:
+    modele: "qwen3-vl:8b"
+    options: {temperature: 0, num_ctx: 8192}
+    description: Lecture des copies et des cours manuscrits
+  correcteur:
+    modele: "mistral-small3.2:24b"
+    options: {temperature: 0.1, num_ctx: 16384}
+    keep_alive: "10m"
+    description: Correction critère par critère
+  generateur:
+    modele: "mistral-small3.2:24b"
+    options: {temperature: 0.6, num_ctx: 16384}
+    description: Exercices, sujets, récapitulatifs
+  relecteur:
+    modele: "qwen3:14b"
+    options: {temperature: 0}
+    description: Vérification indépendante avant impression
+  embeddings:
+    modele: "bge-m3"
+    verrou_gpu: false
+    description: Recherche dans le cours scanné

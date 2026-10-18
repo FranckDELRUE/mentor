@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block contenu %}
+<h1>Feuilles</h1>
+<div class="carte"><table>
+<tr><th>Code</th><th>Type</th><th>Titre</th><th>Statut</th><th>Min</th><th></th></tr>
+{% for f in feuilles %}<tr>
+  <td>{{ f.code }}</td><td>{{ f.type }}</td><td>{{ f.titre }}</td>
+  <td class="{{ {'prete':'ok','a_valider':'alerte','corrigee':'ok'}.get(f.statut,'') }}">{{ f.statut|replace('_',' ') }}</td>
+  <td>{{ f.duree_min or '' }}</td>
+  <td class="ligne">
+    {% if f.statut in ['brouillon','a_valider'] %}<form method="post" action="/feuilles/{{ f.id }}/verifier"><button class="second">Vérifier</button></form>{% endif %}
+    {% if f.statut in ['prete','imprimee'] %}<form method="post" action="/feuilles/{{ f.id }}/imprimer"><button>PDF</button></form>{% endif %}
+    {% if f.pdf %}<a href="/pdf/{{ f.code }}">Ouvrir</a>{% endif %}
+  </td></tr>
+{% else %}<tr><td colspan="6" class="doux">Aucune feuille.</td></tr>{% endfor %}
+</table></div>
+{% endblock %}

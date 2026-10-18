@@ -1,0 +1,3 @@
+erreurs:
+  - {code: E-A, libelle: Erreur A, famille: methode, gravite: 2}
+  - {code: E-B, libelle: Erreur B, famille: calcul, gravite: 3}
