@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block contenu %}
+<h1>Tableau de bord{% if ctx.settings.eleve.prenom %} — {{ ctx.settings.eleve.prenom }}{% endif %}</h1>
+<div class="grille">
+  <section class="carte"><h2>Cette semaine</h2>
+    {% if plan %}<table><tr><th>Quoi</th><th>Min</th><th>Pourquoi</th></tr>
+    {% for e in plan %}<tr><td>{{ e.type|replace('_',' ') }} · <b>{{ e.cible }}</b></td><td>{{ e.duree_min }}</td><td class="doux">{{ e.raison }}</td></tr>{% endfor %}
+    </table>{% else %}<p class="doux">Rien de planifié.</p>{% endif %}</section>
+  <section class="carte"><h2>Prochaines évaluations</h2>
+    {% for e in prochaines %}<p><b>{{ e.date.strftime('%d/%m') }}</b> {{ e.libelle or e.type }} <span class="doux">coef. {{ e.coefficient }}</span></p>
+    {% else %}<p class="doux">Aucune saisie dans <code>calendrier.evaluations</code>.</p>{% endfor %}</section>
+  <section class="carte"><h2>Erreurs récurrentes (6 semaines)</h2>
+    {% for r in recurrentes %}<p><b>{{ r.code }}</b> × {{ r.occurrences }}
+      <span class="{{ 'ok' if r.tendance == 'recul' else 'alerte' }}">{{ r.tendance }}</span></p>
+    {% else %}<p class="doux">Aucune erreur récurrente.</p>{% endfor %}</section>
+  <section class="carte"><h2>Compétences à travailler</h2>
+    {% for c in priorites %}<p><b>{{ c.code }}</b> {{ '%.0f'|format(c.maitrise*100) }} % <span class="doux">± {{ '%.0f'|format(c.incertitude*100) }}</span></p>
+    {% else %}<p class="doux">Pas encore d'observation.</p>{% endfor %}</section>
+  <section class="carte"><h2>Notes du professeur</h2>
+    {% for n in notes %}<p>{{ n.date }} · {{ n.evaluation }} : <b>{{ n.note }}/{{ n.sur }}</b>{% if n.rang %} <span class="doux">rang {{ n.rang }}</span>{% endif %}</p>
+    {% else %}<p class="doux">Aucune note saisie.</p>{% endfor %}</section>
+  <section class="carte"><h2>Tâches</h2>
+    {% for s in ['en_attente','en_cours','a_valider','echec','faite'] %}<p>{{ s|replace('_',' ') }} : <b>{{ etats.get(s, 0) }}</b></p>{% endfor %}
+    <form method="post" action="/sauvegarde"><button class="second">Sauvegarder maintenant</button></form></section>
+</div>
+{% endblock %}

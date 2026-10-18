@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block titre %}{{ app_nom }}{% endblock %}</title>
+<link rel="stylesheet" href="/static/mentor.css">{% block tete %}{% endblock %}</head>
+<body>
+<header>
+  <strong>{{ app_nom }}</strong>
+  <nav>
+    <a href="/">Tableau de bord</a><a href="/depot">Déposer un scan</a>
+    <a href="/validations">À valider {% if nb_validations %}<span class="pastille">{{ nb_validations }}</span>{% endif %}</a>
+    <a href="/feuilles">Feuilles</a><a href="/taches">Tâches</a>
+    {% for libelle, url in menu_discipline %}<a href="{{ url }}">{{ libelle }}</a>{% endfor %}
+  </nav>
+  <span class="doux" style="margin-left:auto">
+    {% if gpu %}GPU : {{ gpu.app }} — {{ gpu.tache }}{% else %}GPU libre{% endif %}
+    {% for code, e in autres_mentor.items() %} · <a href="http://127.0.0.1:{{ e.port }}/">{{ e.nom }}</a>{% endfor %}
+  </span>
+</header>
+<main>
+{% if not pin_defini %}<div class="bandeau">Aucun PIN parent : l'interface est ouverte à tous. <code>uv run mentor parent set-pin</code></div>{% endif %}
+{% block contenu %}{% endblock %}
+</main>
+<footer>{{ app_nom }} · socle {{ version_socle }} · 100 % local</footer>
+</body></html>
