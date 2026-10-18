@@ -19,7 +19,7 @@
 | 2026-10-18 | 10 (présentation) | Page « À valider » : carte avec titre, pastille « Document n°N », date en français, détails en liste libellée au lieu du JSON brut ; styles ajoutés à `mentor.css` | Détails non scalaires affichés en JSON compact ; libellés = clés avec majuscule | Autres pages (tâches, feuilles) non retouchées ; le navigateur peut garder l'ancien CSS en cache (Ctrl+F5) |
 | 2026-10-18 | 10 (dépôt) | Page « Déposer un scan » : champs étiquetés en colonne, bouton « Choisir un fichier » au style des boutons secondaires (`::file-selector-button`) | CSS seulement, aucune route modifiée | Aspect du sélecteur de fichier propre à chaque navigateur pour le texte « Aucun fichier choisi » |
 | 2026-10-18 | 10 (cache CSS) | Le lien vers `mentor.css` porte `?v=<date de modification>` : un CSS modifié est rechargé sans Ctrl+F5 | Version = `st_mtime` du fichier, lue à chaque page | Aucune |
-| 2026-10-18 | 11 (Ctrl+C) | `mentor worker` : attente par `join(timeout=0.5)` en boucle (un `join()` sans délai n'est pas interruptible sous Windows, cause reproduite) ; `serve` : `timeout_graceful_shutdown=3` | Message « Arrêt demandé » à l'interruption | Ctrl+C réel dans une console non simulable depuis l'outil : à confirmer à la main (worker et serve) |
+| 2026-10-18 | 11 (Ctrl+C) | `mentor worker` : attente par `join(timeout=0.5)` en boucle (un `join()` sans délai n'est pas interruptible sous Windows, cause reproduite) ; `serve` : `timeout_graceful_shutdown=3` | Message « Arrêt demandé » à l'interruption | Ctrl+C réel confirmé à la main par le propriétaire (2026-10-18) |
 
 ## Questions ouvertes
 (Une question précise par ligne ; Claude Code les pose ici plutôt que d'inventer.)
