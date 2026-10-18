@@ -5,13 +5,22 @@
 <div class="grille">
 <form class="carte" method="post" action="/depot" enctype="multipart/form-data">
   <h2>Un fichier</h2>
-  <p><input type="file" name="fichier" accept=".pdf,.png,.jpg,.jpeg,.tif,.tiff,.webp" required></p>
-  <p><select name="type_document">
-    <option value="">Détecter (QR) — sinon à classer</option>
-    <option value="cours">Cours</option><option value="ds_sujet">Sujet de DS</option>
-    <option value="ds_copie">Copie de DS corrigée par le professeur</option>
-    <option value="photocopie">Photocopie / document distribué</option><option value="bulletin">Bulletin</option>
-  </select> <input type="date" name="date_document"></p>
+  <div class="champs">
+    <label>Fichier (PDF ou image)
+      <input type="file" name="fichier" accept=".pdf,.png,.jpg,.jpeg,.tif,.tiff,.webp" required>
+    </label>
+    <label>Type de document
+      <select name="type_document">
+        <option value="">Détecter (QR) — sinon à classer</option>
+        <option value="cours">Cours</option><option value="ds_sujet">Sujet de DS</option>
+        <option value="ds_copie">Copie de DS corrigée par le professeur</option>
+        <option value="photocopie">Photocopie / document distribué</option><option value="bulletin">Bulletin</option>
+      </select>
+    </label>
+    <label>Date du document (facultatif)
+      <input type="date" name="date_document">
+    </label>
+  </div>
   <button>Envoyer</button>
 </form>
 <form class="carte" method="post" action="/inbox/scanner">
