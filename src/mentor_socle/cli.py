@@ -191,7 +191,8 @@ def _servir(discipline: Discipline) -> None:
     threading.Thread(target=_veille, args=(ctx, arret), daemon=True, name="mentor-veille").start()
     print(f"{discipline.nom} : http://{reglages.app.host}:{reglages.app.port}")
     try:
-        uvicorn.run(creer_app(ctx), host=reglages.app.host, port=reglages.app.port, log_level="info")
+        uvicorn.run(creer_app(ctx), host=reglages.app.host, port=reglages.app.port, log_level="info",
+                    timeout_graceful_shutdown=3)
     finally:
         arret.set()
         travailleur.arreter()
@@ -201,8 +202,11 @@ def _travailleur_seul(discipline: Discipline) -> None:
     travailleur = _travailler(_ouvrir(discipline))
     print("Travailleur démarré (Ctrl+C pour arrêter).")
     try:
-        travailleur.join()
+        # ``join()`` sans délai n'est pas interruptible par Ctrl+C sous Windows : on l'appelle par petits pas.
+        while travailleur.is_alive():
+            travailleur.join(timeout=0.5)
     except KeyboardInterrupt:
+        print("Arrêt demandé : fin de la tâche en cours…")
         travailleur.arreter()
         travailleur.join(timeout=10)
 
