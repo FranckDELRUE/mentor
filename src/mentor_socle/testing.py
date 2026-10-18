@@ -104,6 +104,7 @@ def contexte_de_test(cls: type[Discipline], dossier: Path | str, *, llm: Any = N
             source = Path(racine_kit) / sous
             if source.is_dir():
                 shutil.copytree(source, dossier / sous, dirs_exist_ok=True)
+    (dossier / "templates").mkdir(exist_ok=True)  # les tests d'impression y déposent leurs gabarits
     config = dossier / "config"
     config.mkdir(parents=True, exist_ok=True)
     reglages = _fusion({"app": {"port": cls.port_defaut, "strict_offline": False}}, settings or {})
