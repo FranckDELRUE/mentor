@@ -132,9 +132,10 @@ def creer_app(ctx: Contexte) -> FastAPI:
                 dt.date.fromisoformat(date_document)
             except ValueError:
                 raise HTTPException(400, "Date invalide.") from None
-        dossier = ctx.data / "_depot"
+        # Dossier unique par envoi : le fichier garde son nom d'origine (sans chemin) dans la base.
+        dossier = ctx.data / "_depot" / uuid.uuid4().hex
         dossier.mkdir(parents=True, exist_ok=True)
-        temporaire = dossier / f"{uuid.uuid4().hex}{extension}"
+        temporaire = dossier / (Path(fichier.filename).name or f"depot{extension}")
         taille = 0
         with temporaire.open("wb") as sortie:
             while bloc := fichier.file.read(1024 * 1024):
@@ -145,8 +146,15 @@ def creer_app(ctx: Contexte) -> FastAPI:
                     raise HTTPException(413, "Fichier trop volumineux.")
                 sortie.write(bloc)
         statut, valeur = inbox.ingerer_fichier(ctx, temporaire, type_document or None, date_document or None)
+        if not any(dossier.iterdir()):
+            dossier.rmdir()
+        recu = f"Document n°{valeur} reçu : la transcription est en file d'attente."
+        if statut == "recu" and not ctx.cx.execute(
+                "SELECT 1 FROM taches WHERE type = 'transcrire_document' AND json_extract(payload, '$.document_id') = ?",
+                (valeur,)).fetchone():
+            recu = f"Document n°{valeur} reçu : son type reste à préciser dans « À valider »."
         message = {
-            "recu": f"Document n°{valeur} reçu : la transcription est en file d'attente.",
+            "recu": recu,
             "doublon": f"Déjà reçu (document n°{valeur}).",
             "renvoye": f"Feuille d'un autre Mentor ({valeur}) : transmise à sa boîte de dépôt.",
             "illisible": f"Fichier illisible : {valeur}",
