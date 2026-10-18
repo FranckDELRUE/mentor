@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import mimetypes
 import time
 import uuid
 from pathlib import Path
@@ -236,6 +237,15 @@ def creer_app(ctx: Contexte) -> FastAPI:
         if not ligne or not ligne["pdf"] or not Path(ligne["pdf"]).is_file():
             raise HTTPException(404, "PDF introuvable.")
         return FileResponse(ligne["pdf"], media_type="application/pdf", filename=f"{code}.pdf")
+
+    @app.get("/documents/{did}/original")
+    def document_original(did: int) -> Response:
+        """Le scan tel que reçu, affiché dans le navigateur (visionneuse PDF ou image)."""
+        ligne = ctx.cx.execute("SELECT fichier_source FROM documents WHERE id = ?", (did,)).fetchone()
+        if not ligne or not ligne["fichier_source"] or not Path(ligne["fichier_source"]).is_file():
+            raise HTTPException(404, "Document introuvable.")
+        type_mime = mimetypes.guess_type(ligne["fichier_source"])[0] or "application/octet-stream"
+        return FileResponse(ligne["fichier_source"], media_type=type_mime, content_disposition_type="inline")
 
     for routeur in ctx.discipline.routeurs():
         app.include_router(routeur)

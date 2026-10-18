@@ -4,7 +4,8 @@
 {% for v in validations %}
 <div class="carte" style="margin-bottom:.8rem">
   <h2>{{ v.motif }}</h2>
-  <p class="doux">{{ v.objet_type }} n°{{ v.objet_id }} · {{ v.cree_le }}</p>
+  <p class="doux">{{ v.objet_type }} n°{{ v.objet_id }} · {{ v.cree_le }}
+    {% if v.objet_type == 'document' %}· <a href="/documents/{{ v.objet_id }}/original" target="_blank" rel="noopener">Voir le document</a>{% endif %}</p>
   {% set d = v.details|dejs %}{% if d %}<pre>{{ d|tojson(indent=1) }}</pre>{% endif %}
   <form class="ligne" method="post" action="/validations/{{ v.id }}">
     <input name="decision" placeholder="Décision / commentaire" style="flex:1">
