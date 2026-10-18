@@ -7,7 +7,9 @@ import sqlite3
 from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
+
+from pydantic import BaseModel, create_model
 
 from mentor_socle.referentiel import charger_yaml
 
@@ -42,6 +44,27 @@ class Taxonomie:
                 doubles.add(e.code)
             vus.add(e.code)
         return sorted(doubles)
+
+    def modele_erreur(self) -> type[BaseModel]:
+        """Modèle Pydantic d'une erreur relevée dont ``code`` est limité aux codes de la taxonomie.
+
+        À utiliser dans le schéma de sortie d'un appel au modèle : le schéma JSON transmis à Ollama
+        énumère les codes permis (décodage contraint), et toute valeur hors liste est rejetée à la
+        validation puis réparée par ``appel_structure``.
+        """
+        if not self._par_code:
+            raise ValueError("taxonomie vide : aucun code à proposer au modèle")
+        return create_model(
+            "ErreurRelevee",
+            code=(Literal[tuple(sorted(self._par_code))], ...),
+            chapitre=(str | None, None),
+            competence=(str | None, None),
+            extrait=(str | None, None),
+        )
+
+    def pour_prompt(self) -> str:
+        """Liste lisible des codes permis (``code : libellé [famille]``), à insérer dans le prompt."""
+        return "\n".join(f"- {e.code} : {e.libelle} [{e.famille}]" for e in self._par_code.values())
 
     def __getitem__(self, code: str) -> TypeErreur:
         return self._par_code[code]
