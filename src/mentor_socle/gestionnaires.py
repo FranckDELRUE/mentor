@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from mentor_socle.corpus import indexer
+from mentor_socle.sauvegarde import gestionnaire_sauvegarde
 from mentor_socle.scan.transcription import transcrire_document
 from mentor_socle.taches import Gestionnaire
 
@@ -11,9 +13,17 @@ if TYPE_CHECKING:
     from mentor_socle.contexte import Contexte
 
 
+def _indexer_corpus(ctx: Contexte, payload: dict, tache_id: int) -> dict:
+    return {"indexes": indexer(ctx)}
+
+
 def socle() -> dict[str, Gestionnaire]:
-    """Tâches du socle (sauvegarde et indexation s'ajouteront aux lots suivants)."""
-    return {"transcrire_document": transcrire_document}
+    """Tâches du socle : transcription, sauvegarde, indexation du corpus."""
+    return {
+        "transcrire_document": transcrire_document,
+        "sauvegarde": gestionnaire_sauvegarde,
+        "indexer_corpus": _indexer_corpus,
+    }
 
 
 def tous(ctx: Contexte) -> dict[str, Gestionnaire]:

@@ -69,3 +69,47 @@ def references_connues(
         for ref in references
         if ref not in connues
     ]
+
+
+def verifier_kit(discipline: Any, afficher: bool = True) -> int:
+    """Contrôle le kit d'une discipline ; rend 0 (aucune erreur) ou 1. Les alertes ne font pas échouer."""
+    from mentor_socle.llm.modeles import charger_modeles
+    from mentor_socle.llm.prompts import lire_prompt
+    from mentor_socle.pedagogie import erreurs
+
+    anomalies: list[Anomalie] = []
+    for fichier in sorted(discipline.dossier_referentiel.glob("*.yaml")):
+        try:
+            charger_yaml(fichier)
+        except (yaml.YAMLError, OSError, UnicodeDecodeError) as e:
+            anomalies.append(Anomalie("erreur", fichier.name, f"YAML illisible : {e}"))
+    try:
+        roles = set(charger_modeles(discipline.dossier_config).roles)
+    except (FileNotFoundError, ValueError, yaml.YAMLError) as e:
+        anomalies.append(Anomalie("erreur", "modeles.yaml", f"modèles illisibles : {e}"))
+    else:
+        for fichier in sorted(discipline.dossier_prompts.glob("*.md")):
+            try:
+                role = lire_prompt(fichier).role
+            except (ValueError, yaml.YAMLError) as e:
+                anomalies.append(Anomalie("erreur", fichier.name, str(e)))
+                continue
+            if role not in roles:
+                anomalies.append(Anomalie("erreur", fichier.name, f"rôle absent de modeles.yaml : {role}"))
+    if discipline.fichier_taxonomie.is_file():
+        nom = discipline.fichier_taxonomie.name
+        try:
+            doublons = erreurs.charger(discipline.fichier_taxonomie).doublons()
+            anomalies += [Anomalie("erreur", nom, f"code en double : {c}") for c in doublons]
+        except Exception as e:  # noqa: BLE001 — toute taxonomie illisible est une anomalie
+            anomalies.append(Anomalie("erreur", nom, f"taxonomie illisible : {e}"))
+    try:
+        anomalies += discipline.verifier_referentiel(discipline.charger_referentiel())
+    except Exception as e:  # noqa: BLE001
+        anomalies.append(Anomalie("erreur", "referentiel", f"référentiel illisible : {e}"))
+    if afficher:
+        for a in anomalies:
+            print(a)
+        if not anomalies:
+            print("Kit valide.")
+    return int(any(a.niveau == "erreur" for a in anomalies))
